@@ -1,10 +1,12 @@
+require('strings/zh-Hans.strings');
+
 let cityInfo = {
     name: '', //城市名
     tmp: '', //气温
     aqi: '', //空气质量指数
     qlty: '', //空气质量
     cond_txt: '', //实况天气状况
-    cond_code: ''
+    cond_code: '' //实况天气code
 }
 
 
@@ -13,16 +15,8 @@ function getLocal() { //获取位置
         handler: function(resp) {
             let lat = resp.lat
             let lng = resp.lng
-                // var lat = 116.97
-                // var lng = 45.52
-                // let location = $cache.get("location");
 
-            // if (location != '') {
-            //     location = JSon.
-            // } else {
             getWeather(lat, lng)
-                // }
-
         }
     })
 }
@@ -34,12 +28,17 @@ function getWeather(latt, lngg) { //获取天气
             latt + "," + lngg + "&lang=zh&unit=m",
 
         handler: function(resp) {
-            let data = resp.data.HeWeather6[0]
-            cityInfo.name = data.basic.parent_city //城市名称
-            cityInfo.tmp = data.now.tmp //气温
-            cityInfo.cond_txt = data.now.cond_txt //天气状况
-            cityInfo.cond_code = data.now.cond_code
-            getAir(latt, lngg)
+            if (resp.data.HeWeather6[0].status == 'ok') {
+                let data = resp.data.HeWeather6[0]
+                cityInfo.name = data.basic.parent_city //城市名称
+                cityInfo.tmp = data.now.tmp //气温
+                cityInfo.cond_txt = data.now.cond_txt //天气状况
+                cityInfo.cond_code = data.now.cond_code
+                getAir(latt, lngg)
+            } else {
+                someError(resp.data.HeWeather6[0].status)
+            }
+
         }
     })
 }
@@ -50,10 +49,14 @@ function getAir(latt, lngg) { //获取空气质量相关
             latt + "," + lngg + "&lang=zh&unit=m",
 
         handler: function(resp) {
-            let data = resp.data.HeWeather6[0]
-            cityInfo.aqi = data.air_now_city.aqi //空气质量指数
-            cityInfo.qlty = data.air_now_city.qlty //空气质量
-            showView()
+            if (resp.data.HeWeather6[0].status == 'ok') {
+                let data = resp.data.HeWeather6[0]
+                cityInfo.aqi = data.air_now_city.aqi //空气质量指数
+                cityInfo.qlty = data.air_now_city.qlty //空气质量
+                showView()
+            } else {
+                someError(resp.data.HeWeather6[0].status)
+            }
         }
     })
 }
@@ -167,6 +170,12 @@ function showView() {
         }]
     })
 }
+
+
+function someError(code) {
+    $ui.toast($l10n(code))
+}
+
 
 module.exports = {
     getLocal: getLocal

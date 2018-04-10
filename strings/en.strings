@@ -1,3 +1,7 @@
-"OK" = "OK";
-"DONE" = "Done";
-"HELLO_WORLD" = "Hello, World!";
+"sign error" = "sign error";
+"param invalid" = "param invalid";
+"too fast" = "too fast";
+"permission denied" = "permission denied";
+"no more requests" = "no more requests";
+"unknown location" = "unknown location";
+"no data for this location" = "no data for this location";

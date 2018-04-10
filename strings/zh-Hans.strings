@@ -1,3 +1,7 @@
-"OK" = "好的";
-"DONE" = "完成";
-"HELLO_WORLD" = "你好，世界！";
+"sign error" = "签名错误";
+"param invalid" = "参数错误";
+"too fast" = "超过限定的QPM";
+"permission denied" = "无访问权限";
+"no more requests" = "超过访问次数";
+"unknown location" = "未知或错误城市/地区";
+"no data for this location" = "未该城市/地区没有你所请求的数据";
