@@ -1,4 +1,4 @@
-var app = require('scripts/weather_jsbox');
+var app = require('scripts/app');
 
 app.getLocal();
 
