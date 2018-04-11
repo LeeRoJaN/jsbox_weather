@@ -35,6 +35,7 @@ function getWeather(latt, lngg) { //获取天气
                 cityInfo.cond_txt = data.now.cond_txt //天气状况
                 cityInfo.cond_code = data.now.cond_code
                 getAir(latt, lngg)
+
             } else {
                 someError(resp.data.HeWeather6[0].status)
             }
@@ -53,7 +54,16 @@ function getAir(latt, lngg) { //获取空气质量相关
                 let data = resp.data.HeWeather6[0]
                 cityInfo.aqi = data.air_now_city.aqi //空气质量指数
                 cityInfo.qlty = data.air_now_city.qlty //空气质量
+                cityInfo.time = new Date().getTime()
                 showView()
+
+                $cache.setAsync({
+                    key: "Info",
+                    value: cityInfo,
+                    handler: function(object) {
+
+                    }
+                })
             } else {
                 someError(resp.data.HeWeather6[0].status)
             }
@@ -89,21 +99,10 @@ function showView() {
                         text: '数据来源：和风天气'
                     }
                 }],
-                rowHeight: 140,
+                rowHeight: 60,
                 separatorHidden: true,
                 selectable: false,
                 template: [{
-                        type: "image",
-                        props: {
-                            id: "image",
-                            bgcolor: $rgba(100, 100, 100, 0),
-                        },
-                        layout: function(make, view) {
-                            make.left.equalTo(20)
-                            make.width.equalTo(100)
-                        }
-                    },
-                    {
                         type: "label",
                         props: {
                             id: "name",
@@ -111,8 +110,19 @@ function showView() {
                             lines: 1
                         },
                         layout: function(make) {
-                            make.left.equalTo($("image").right).offset(50)
+                            make.center.equalTo(0)
                             make.top.equalTo(20)
+                        }
+                    },
+                    {
+                        type: "image",
+                        props: {
+                            id: "image",
+                            bgcolor: $rgba(100, 100, 100, 0),
+                        },
+                        layout: function(make, view) {
+                            make.left.equalTo(40)
+                            make.width.equalTo(100)
                         }
                     },
                     {
@@ -123,7 +133,7 @@ function showView() {
                             lines: 1,
                         },
                         layout: function(make) {
-                            make.left.equalTo($("image").right).offset(170)
+                            make.right.equalTo(-20)
                             make.top.equalTo(12)
                         }
                     },
@@ -161,7 +171,7 @@ function showView() {
                         },
                         layout: function(make) {
                             make.left.equalTo($("tmp"))
-                            make.top.equalTo($("tmp").bottom).offset(5)
+                            make.top.equalTo($("tmp").bottom).offset(1)
                         }
                     },
                 ]
@@ -172,11 +182,27 @@ function showView() {
 }
 
 
-function someError(code) {
+function someError(code) { //错误提示
     $ui.toast($l10n(code))
 }
 
+function init() {
+    let Info = $cache.get('Info');
+    if (Info == null) { //是否有缓存信息
+        getLocal()
+    } else {
+        if (new Date().getTime() - Info.time > 3600000) { //缓存时间判断是否大于1小时
+            $console.info('new');
+            getLocal()
+        } else {
+            $console.info('old');
+            cityInfo = Info
+            showView()
+        }
+    }
+
+}
 
 module.exports = {
-    getLocal: getLocal
+    init: init
 }
